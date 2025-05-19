@@ -4,7 +4,7 @@ const response = await fetch(API_URL, {
     'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
     'Content-Type': 'application/json',
     // HEADER WAJIB OPENROUTER
-    'HTTP-Referer': 'https://your-domain.vercel.app', // Ganti dengan URL Vercel Anda
+    'HTTP-Referer': 'https://chatbot-wa-three.vercel.app/', // Ganti dengan URL Vercel Anda
     'X-Title': 'Nanami WhatsApp Bot'
   },
   body: JSON.stringify({
