@@ -1,6 +1,6 @@
 # ❄️ Nanami-AI ❄️
 
-> Nanami-AI adalah AI virtual yang lembut dan tenang. Ia hadir untuk mendengarkan, menemani, dan memberi pelukan lewat kata.
+> Nanami-AI adalah AI virtual yang lembut dan tenang. Ia hadir untuk mendengarkan, menemani, dan memberi pelukan lewat kata. (ꈍoꈍ🌸)
 
 ![Preview Chat](https://github.com/Rosmontis-Chan/Chatbot-WA/blob/main/Imou.png) <!-- Ganti dengan link gambar kamu -->
 
