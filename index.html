@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nanami Chan ✨</title>
+    <style>
+        /* === GAYA UTAMA === */
+        :root {
+            --primary: #ff6b6b;
+            --secondary: #ffd93d;
+        }
+
+        body {
+            font-family: 'Comic Neue', cursive;
+            background: #fff5f5;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* === HEADER === */
+        h1 {
+            text-align: center;
+            color: #ff4757;
+            text-shadow: 2px 2px 4px rgba(255, 107, 107, 0.2);
+            font-size: 2.5em;
+            margin-bottom: 30px;
+        }
+
+        /* === CHAT AREA === */
+        #chatbox {
+            background: white;
+            border: 2px solid var(--secondary);
+            border-radius: 15px;
+            height: 500px;
+            padding: 20px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .message {
+            margin: 10px 0;
+            padding: 12px 18px;
+            max-width: 80%;
+            animation: fadeIn 0.3s;
+        }
+
+        .user {
+            background: var(--primary);
+            color: white;
+            border-radius: 15px 15px 0 15px;
+            margin-left: auto;
+        }
+
+        .assistant {
+            background: #fff;
+            border: 2px solid var(--secondary);
+            border-radius: 15px 15px 15px 0;
+        }
+
+        /* === INPUT AREA === */
+        #input-container {
+            display: flex;
+            gap: 10px;
+        }
+
+        #user-input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid var(--secondary);
+            border-radius: 12px;
+            font-family: 'Comic Neue';
+        }
+
+        button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌸 Nanami Chan AI 🌸</h1>
+        
+        <!-- Chat Container -->
+        <div id="chatbox"></div>
+
+        <!-- Input Area -->
+        <div id="input-container">
+            <input type="text" id="user-input" placeholder="Tulis pesan untuk Nanami~">
+            <button onclick="sendMessage()">Kirim</button>
+            <button onclick="clearChat()">Bersihkan</button>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = "https://openrouter.ai/api/v1/chat/completions";
+        const API_KEY = "API_KEY_ANDA";
+
+        let chatHistory = [];
+
+        async function sendMessage() {
+            const input = document.getElementById('user-input');
+            const message = input.value.trim();
+            if (!message) return;
+
+            addMessage(message, 'user');
+            input.value = '';
+            
+            const loadingId = addLoadingMessage();
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${API_KEY}`
+                    },
+                    body: JSON.stringify({
+                        model: "openai/gpt-3.5-turbo",
+                        messages: [
+                            {
+                                role: "system",
+                                content: "Kamu adalah Nanami Chan, chatbot imut dan perhatian. Gunakan gaya bahasa santai dengan emoji dan tanda baca yang ekspresif! Balas dalam bahasa Indonesia campur sedikit bahasa daerah."
+                            },
+                            ...chatHistory,
+                            { role: "user", content: message }
+                        ]
+                    })
+                });
+
+                const data = await response.json();
+                const reply = data.choices[0].message.content;
+                
+                chatHistory.push({ role: "user", content: message });
+                chatHistory.push({ role: "assistant", content: reply });
+                
+                removeLoadingMessage(loadingId);
+                addMessage(reply, 'assistant');
+            } catch (error) {
+                console.error('Error:', error);
+                removeLoadingMessage(loadingId);
+                addMessage("(>_<) Yahh... Lagi error nih, coba lagi ya!", 'assistant');
+            }
+        }
+
+        // Fungsi helper tetap sama
+    </script>
+</body>
+</html>
