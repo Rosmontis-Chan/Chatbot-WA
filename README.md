@@ -4,7 +4,7 @@
 >
 # ✦ FITUR UTAMA :
 
-• Nada lembut dan menenangkan
+• Nada lembut dan menenangka
 • Bisa curhat dan pertanyaan coding
 • Cocok buat teman belajar
 • Dapat diatur gaya bahasanya
