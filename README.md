@@ -14,4 +14,4 @@
 - Ringan, tapi terasa hangat
 
 ## Lisensi
-MIT © 2024 Rosmontis-Chan
+MIT © 2025 Rosmontis-Chan
