@@ -1,18 +1,20 @@
 const { Client, LocalAuth } = require("whatsapp-web.js");
 const qrcode = require("qrcode-terminal");
 const express = require("express");
+const { chromium } = require("playwright-core"); // Pakai playwright-core
 
 // Konfigurasi WhatsApp
 const client = new Client({
   authStrategy: new LocalAuth(),
-  puppeteer: {
-    headless: "new",
+  browser: {
+    browser: chromium,
     args: [
       "--no-sandbox",
       "--disable-setuid-sandbox",
-      "--disable-dev-shm-usage"
+      "--disable-dev-shm-usage",
+      "--single-process"
     ],
-    executablePath: "/usr/bin/chromium-browser" // Path khusus untuk Railway
+    executablePath: "/usr/bin/chromium-browser" // Path default Chromium di Railway
   }
 });
 
