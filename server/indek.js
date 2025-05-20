@@ -1,28 +1,33 @@
-// File: index.js
 const { Client, LocalAuth } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
+const express = require('express');
 
-// Inisialisasi Bot
+// Setup WhatsApp Client
 const client = new Client({
   authStrategy: new LocalAuth(),
-  puppeteer: { headless: true }
+  puppeteer: {
+    headless: true,
+    args: ['--no-sandbox', '--disable-setuid-sandbox']
+  }
 });
 
-// TAMPILKAN QR CODE DI LOGS RAILWAY
+// Tampilkan QR Code di Logs Railway
 client.on('qr', (qr) => {
   console.log("SCAN INI DI WHATSAPP:");
-  qrcode.generate(qr, { small: true }); // QR muncul di logs
+  qrcode.generate(qr, { small: true });
 });
 
-// BOT SIAP
+// Bot siap
 client.on('ready', () => {
-  console.log('BOT AKTIF! 🚀');
+  console.log('✅ Bot aktif!');
 });
 
-// JALANKAN BOT
+// Start bot
 client.initialize();
 
 // Biarkan server tetap hidup
-const express = require('express');
 const app = express();
-app.listen(3000, () => console.log('Server hidup!'));
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`🚀 Server jalan di port ${PORT}`);
+});
