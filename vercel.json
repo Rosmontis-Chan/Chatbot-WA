@@ -1,3 +1,15 @@
 {
-  "rewrites": [{ "source": "/api/whatsapp", "destination": "/api/whatsapp" }]
+  "routes": [
+    {
+      "src": "/api/whatsapp",
+      "dest": "/api/whatsapp.js",
+      "methods": ["GET", "POST"]
+    }
+  ],
+  "functions": {
+    "api/whatsapp.js": {
+      "memory": 3008,
+      "maxDuration": 60
+    }
+  }
 } 
