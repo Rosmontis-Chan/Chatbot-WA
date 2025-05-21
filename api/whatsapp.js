@@ -1,4 +1,5 @@
-const { default: makeWASocket, useSingleFileAuthState } = require('@whapi/baileys')
+const { default: makeWASocket, useSingleFileAuthState } = require('@adiwajshing/baileys') // PAKAI INI
+// ... (kode lainnya tetap sama seperti sebelumnya)
 const axios = require('axios')
 const express = require('express')
 
