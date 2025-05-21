@@ -1,14 +1,8 @@
 {
-  "routes": [{
-    "src": "/api/whatsapp",
-    "dest": "/api/whatsapp.js",
-    "methods": ["GET"],
-    "continue": true
-  }],
   "functions": {
     "api/whatsapp.js": {
-      "memory": 3008,
-      "maxDuration": 60
+      "memory": 4096,
+      "maxDuration": 300
     }
   }
 } 
