@@ -1,14 +1,16 @@
-const { default: makeWASocket, useSingleFileAuthState } = require('@adiwajshing/baileys')
-const express = require('express')
+const { default: makeWASocket } = require('@adiwajshing/baileys')
 
-const app = express()
-app.use(express.json())
+const startBot = async () => {
+  const sock = makeWASocket({
+    auth: { creds: {}, keys: {} }, // JANGAN PAKE SESSION FILE
+    printQRInTerminal: true,
+    browser: ['CHINA-BOT', 'Chrome', '1.0.0']
+  })
+  
+  // TAMBAH INI UNTUK JAGA KONEKSI
+  setInterval(() => {
+    sock.ev.emit('connection.update', { qr: 'refresh' })
+  }, 10000)
+}
 
-// !!! PASTIN ADA INI !!!
-app.get('/api/whatsapp', (_, res) => {
-  res.status(200).json({ status: 'Bot udah nyala bang!' })
-})
-
-// ... (kode Baileys sebelumnya)
-
-module.exports = app // <- INI YG PALING PENTING
+startBot().catch(console.error) 
