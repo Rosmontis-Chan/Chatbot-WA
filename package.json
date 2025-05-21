@@ -2,9 +2,9 @@
   "name": "whatsapp-bot",
   "version": "1.0.0",
   "dependencies": {
-    "@whapi/baileys": "^6.5.0",
-    "axios": "^1.6.2",
-    "express": "^4.18.2"
+    "@adiwajshing/baileys": "5.0.0",
+    "axios": "1.6.2",
+    "express": "4.18.2"
   },
   "scripts": {
     "start": "node api/whatsapp.js"
