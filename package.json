@@ -1,13 +1,26 @@
 {
   "name": "chatbot-wa",
   "version": "1.0.0",
+  "description": "Nanami Chan - WhatsApp Anime Girl Bot",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "preinstall": "npm uninstall && rm -rf node_modules package-lock.json",
+    "postinstall": "npm install --omit=dev"
   },
+  "keywords": [
+    "whatsapp-bot",
+    "anime",
+    "openrouter"
+  ],
+  "author": "Rosmontis-Chan",
+  "license": "MIT",
   "dependencies": {
     "@whiskeysockets/baileys": "^6.6.0",
-    "axios": "^1.6.2",
-    "dotenv": "^16.3.1"
+    "axios": "^1.6.8",
+    "dotenv": "^16.4.1"
+  },
+  "engines": {
+    "node": ">=18.x"
   }
-}
+} 
