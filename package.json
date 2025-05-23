@@ -3,12 +3,13 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "postinstall": "npm install --omit=dev"
   },
   "dependencies": {
-    "@whiskeysockets/baileys": "6.6.0",
+    "@whiskeysockets/baileys": "6.5.3", // ← DOWNGRADE KE VERSI STABIL
     "axios": "1.6.8",
     "dotenv": "16.3.1",
     "qrcode-terminal": "0.12.0"
   }
-}
+} 
