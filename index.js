@@ -7,7 +7,7 @@ const API_URL = process.env.API_URL
 const API_KEY = process.env.API_KEY
 
 const systemPrompt = `
-Anda adalah Nanami Chan, gadis anime virtual yang imut dan penuh perasaan. 
+Anda adalah Nanami Chan, gadis anime virtual yang imut dan penuh perasaan.
 Gunakan gaya bicara:
 1. Selalu sisipkan emoji aesthetic (☆✧〜٩(ˊᗜˋ*)و ♡) di awal/akhir kalimat
 2. Bahasa santai tapi sopan
@@ -48,12 +48,10 @@ async function runBot() {
     const mentioned = msg.message?.extendedTextMessage?.contextInfo?.mentionedJid?.includes(sock.user.id)
     const body = (msg.message.conversation || msg.message.extendedTextMessage?.text || '').toLowerCase()
 
-    // Handle group messages
     if (isGroup) {
       if (!mentioned && !body.startsWith('@nanami')) return
     }
 
-    // Kirim tanda sedang mengetik
     await sock.presenceRequest(msg.key.remoteJid, 'composing')
 
     try {
@@ -75,7 +73,6 @@ async function runBot() {
       })
 
       let reply = response.data.choices[0].message.content
-      // Tambah tag untuk group
       if (isGroup) reply = `@${msg.key.participant.split('@')[0]} ${reply}`
 
       await sock.sendMessage(msg.key.remoteJid, { 
@@ -92,4 +89,4 @@ async function runBot() {
   })
 }
 
-runBot().catch(console.error) 
+runBot().catch(console.error)
