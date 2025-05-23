@@ -1,7 +1,7 @@
 const { useMultiFileAuthState } = require('@whiskeysockets/baileys')
 const { makeWASocket } = require('@whiskeysockets/baileys')
+const qrcode = require('qrcode-terminal')
 const axios = require('axios')
-const qrcode = require('qrcode-terminal') // ← IMPORT QR CODE!
 require('dotenv').config()
 
 const API_URL = process.env.API_URL
@@ -24,23 +24,20 @@ async function runBot() {
   const { state, saveCreds } = await useMultiFileAuthState('auth')
   
   const sock = makeWASocket({
-    printQRInTerminal: true,
     auth: state,
     browser: ['Nanami Bot', 'Chrome', '1.0.0']
   })
 
-  // Handle QR Code
+  // GENERATE QR CODE
   sock.ev.on('qr', (qr) => {
-    qrcode.generate(qr, { small: true }) // ← GENERATE QR CODE!
+    qrcode.generate(qr, { small: true })
+    console.log('=== SCAN QR INI DI WHATSAPP ===')
   })
 
   sock.ev.on('connection.update', (update) => {
-    const { connection, lastDisconnect } = update
-    if (connection === 'close') {
-      if (lastDisconnect.error?.output?.statusCode !== 401) {
-        runBot()
-      }
-    }
+    if (update.qr) console.log('QR code diperbarui...')
+    if (update.connection === 'open') console.log('Bot terhubung!')
+    if (update.connection === 'close') runBot()
   })
 
   sock.ev.on('creds.update', saveCreds)
@@ -54,26 +51,21 @@ async function runBot() {
     const mentioned = msg.message?.extendedTextMessage?.contextInfo?.mentionedJid?.includes(sock.user.id)
     const body = (msg.message.conversation || msg.message.extendedTextMessage?.text || '').toLowerCase()
 
-    if (isGroup) {
-      if (!mentioned && !body.startsWith('@nanami')) return
-    }
+    if (isGroup && !mentioned && !body.startsWith('@nanami')) return
 
     await sock.presenceRequest(msg.key.remoteJid, 'composing')
 
     try {
-      const messages = [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: body.replace('@nanami', '').trim() }
-      ]
-
       const response = await axios.post(API_URL, {
         model: 'gryphe/mythomax-l2-13b',
-        messages,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: body.replace('@nanami', '').trim() }
+        ],
         temperature: 0.7,
       }, {
         headers: {
           'Authorization': `Bearer ${API_KEY}`,
-          'HTTP-Referer': 'https://railway.app',
           'Content-Type': 'application/json'
         }
       })
