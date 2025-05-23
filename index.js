@@ -1,90 +1,112 @@
-const { useMultiFileAuthState } = require('@whiskeysockets/baileys')
-const { makeWASocket } = require('@whiskeysockets/baileys')
+const { useMultiFileAuthState, makeWASocket } = require('@whiskeysockets/baileys')
 const qrcode = require('qrcode-terminal')
 const axios = require('axios')
 require('dotenv').config()
 
-const API_URL = process.env.API_URL
-const API_KEY = process.env.API_KEY
+// ========== CONFIG ==========
+const API_CONFIG = {
+  url: process.env.API_URL,
+  key: process.env.API_KEY,
+  model: 'gryphe/mythomax-l2-13b'
+}
 
-const systemPrompt = `
-Anda adalah Nanami Chan, gadis anime virtual yang imut dan penuh perasaan.
-Gunakan gaya bicara:
-1. Selalu sisipkan emoji aesthetic (☆✧〜٩(ˊᗜˋ*)و ♡) di awal/akhir kalimat
-2. Bahasa santai tapi sopan
-3. Panggil user dengan "Senpai"
-4. Untuk pertanyaan serius, tetap pertahankan sifat girly
-5. JANGAN pernah buat pesan grup kecuali di-tag @Nanami Chan
-6. Gunakan maksimal 2 baris kalimat
-Contoh: 
-"Ah, Senpai sedang kesepian? Nanami di sini menemani lho~ (´･ω･‛)☆"
+const BOT_CONFIG = {
+  name: "Nanami Chan",
+  prefix: "@nanami",
+  owner: "Senpai"
+}
+
+const SYSTEM_PROMPT = `
+[Karakter Nanami]
+1. Gadis anime imut dengan suara manis
+2. Selalu gunakan emoji (contoh: 🌸🎀💮)
+3. Panggil user "${BOT_CONFIG.owner}"
+4. Jangan respons pesan grup tanpa mention
 `.trim()
+// ============================
 
-async function runBot() {
+async function startBot() {
+  // 1. Auth Management
   const { state, saveCreds } = await useMultiFileAuthState('auth')
   
-  const sock = makeWASocket({
+  // 2. Initialize Socket
+  const bot = makeWASocket({
     auth: state,
-    browser: ['Nanami Bot', 'Chrome', '1.0.0']
+    printQRInTerminal: false,
+    logger: { level: 'silent' } // Nonaktifkan log internal
   })
 
-  // GENERATE QR CODE
-  sock.ev.on('qr', (qr) => {
+  // 3. QR Code Handler (Simplified)
+  bot.ev.on('qr', qr => {
     qrcode.generate(qr, { small: true })
-    console.log('=== SCAN QR INI DI WHATSAPP ===')
+    console.log('\n\n=== SCAN INI DI WHATSAPP ===\n')
   })
 
-  sock.ev.on('connection.update', (update) => {
-    if (update.qr) console.log('QR code diperbarui...')
-    if (update.connection === 'open') console.log('Bot terhubung!')
-    if (update.connection === 'close') runBot()
+  // 4. Connection Handler (Auto-Restart)
+  bot.ev.on('connection.update', ({ connection, lastDisconnect }) => {
+    if(connection === 'close') {
+      console.log('Koneksi terputus, mencoba ulang dalam 5 detik...')
+      setTimeout(startBot, 5000)
+    }
+    if(connection === 'open') console.log('Berhasil terhubung!')
   })
 
-  sock.ev.on('creds.update', saveCreds)
-
-  sock.ev.on('messages.upsert', async ({ messages }) => {
-    const msg = messages[0]
-    if (!msg.message || msg.key.fromMe) return
-
-    const chat = await sock.getChatById(msg.key.remoteJid)
-    const isGroup = chat.id.endsWith('@g.us')
-    const mentioned = msg.message?.extendedTextMessage?.contextInfo?.mentionedJid?.includes(sock.user.id)
-    const body = (msg.message.conversation || msg.message.extendedTextMessage?.text || '').toLowerCase()
-
-    if (isGroup && !mentioned && !body.startsWith('@nanami')) return
-
-    await sock.presenceRequest(msg.key.remoteJid, 'composing')
-
+  // 5. Message Handler (Ultra Safe)
+  bot.ev.on('messages.upsert', async ({ messages }) => {
     try {
-      const response = await axios.post(API_URL, {
-        model: 'gryphe/mythomax-l2-13b',
+      const msg = messages[0]
+      if(!msg.message || msg.key.fromMe) return
+      
+      // Basic Validation
+      const body = msg.message?.conversation || ''
+      const chat = msg.key.remoteJid
+      const isGroup = chat.endsWith('@g.us')
+      
+      if(isGroup && !body.includes(BOT_CONFIG.prefix)) return
+      
+      // Typing Indicator
+      await bot.presenceRequest(chat, 'composing')
+      
+      // API Call
+      const response = await axios.post(API_CONFIG.url, {
+        model: API_CONFIG.model,
         messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: body.replace('@nanami', '').trim() }
+          { role: "system", content: SYSTEM_PROMPT },
+          { role: "user", content: body.replace(BOT_CONFIG.prefix, '').trim() }
         ],
-        temperature: 0.7,
+        temperature: 0.7
       }, {
         headers: {
-          'Authorization': `Bearer ${API_KEY}`,
+          Authorization: `Bearer ${API_CONFIG.key}`,
           'Content-Type': 'application/json'
         }
       })
 
-      let reply = response.data.choices[0].message.content
-      if (isGroup) reply = `@${msg.key.participant.split('@')[0]} ${reply}`
-
-      await sock.sendMessage(msg.key.remoteJid, { 
-        text: reply,
-        mentions: isGroup ? [msg.key.participant] : []
-      })
+      // Send Reply
+      const reply = response.data.choices[0].message.content
+      await bot.sendMessage(chat, { text: reply })
       
-    } catch (error) {
-      console.error('Error:', error)
-      await sock.sendMessage(msg.key.remoteJid, { 
-        text: 'Gomen ne, Senpai! Nanami lagi error... (*/ω＼*)'
+    } catch(error) {
+      console.error('ERROR:', error.message)
+      await bot.sendMessage(chat, { 
+        text: `${BOT_CONFIG.name} lagi error, ${BOT_CONFIG.owner}... 😢`
       })
     }
   })
+
+  // 6. Save Creds
+  bot.ev.on('creds.update', saveCreds)
 }
 
-runBot().catch(console.error)
+// 7. Start Bot dengan Error Handling
+startBot().catch(err => {
+  console.error('FATAL ERROR:', err)
+  process.exit(1)
+})
+
+// 8. Keep Alive untuk Railway
+const http = require('http')
+http.createServer((req, res) => {
+  res.writeHead(200)
+  res.end('Nanami Bot is Running!')
+}).listen(process.env.PORT || 3000)
