@@ -1,6 +1,7 @@
 const { useMultiFileAuthState } = require('@whiskeysockets/baileys')
 const { makeWASocket } = require('@whiskeysockets/baileys')
 const axios = require('axios')
+const qrcode = require('qrcode-terminal') // ← IMPORT QR CODE!
 require('dotenv').config()
 
 const API_URL = process.env.API_URL
@@ -16,7 +17,7 @@ Gunakan gaya bicara:
 5. JANGAN pernah buat pesan grup kecuali di-tag @Nanami Chan
 6. Gunakan maksimal 2 baris kalimat
 Contoh: 
-"Ah, Senpai sedang kesepian? Nanami di sini menemani lho~ (´･ω･‛)☆"  // BACKTICK DIUBAH KE KARAKTER UNICODE AMAN
+"Ah, Senpai sedang kesepian? Nanami di sini menemani lho~ (´･ω･‛)☆"
 `.trim()
 
 async function runBot() {
@@ -26,6 +27,11 @@ async function runBot() {
     printQRInTerminal: true,
     auth: state,
     browser: ['Nanami Bot', 'Chrome', '1.0.0']
+  })
+
+  // Handle QR Code
+  sock.ev.on('qr', (qr) => {
+    qrcode.generate(qr, { small: true }) // ← GENERATE QR CODE!
   })
 
   sock.ev.on('connection.update', (update) => {
@@ -48,12 +54,10 @@ async function runBot() {
     const mentioned = msg.message?.extendedTextMessage?.contextInfo?.mentionedJid?.includes(sock.user.id)
     const body = (msg.message.conversation || msg.message.extendedTextMessage?.text || '').toLowerCase()
 
-    // Handle group messages
     if (isGroup) {
       if (!mentioned && !body.startsWith('@nanami')) return
     }
 
-    // Kirim tanda sedang mengetik
     await sock.presenceRequest(msg.key.remoteJid, 'composing')
 
     try {
@@ -75,7 +79,6 @@ async function runBot() {
       })
 
       let reply = response.data.choices[0].message.content
-      // Tambah tag untuk group
       if (isGroup) reply = `@${msg.key.participant.split('@')[0]} ${reply}`
 
       await sock.sendMessage(msg.key.remoteJid, { 
