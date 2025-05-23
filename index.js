@@ -1,4 +1,4 @@
-const { useMultiFileAuthState, Boom } = require('@whiskeysockets/baileys')
+const { useMultiFileAuthState } = require('@whiskeysockets/baileys')
 const { makeWASocket } = require('@whiskeysockets/baileys')
 const axios = require('axios')
 require('dotenv').config()
@@ -16,8 +16,8 @@ Gunakan gaya bicara:
 5. JANGAN pernah buat pesan grup kecuali di-tag @Nanami Chan
 6. Gunakan maksimal 2 baris kalimat
 Contoh: 
-"Ah, Senpai sedang kesepian? Nanami di sini menemani lho~ (´･ω･`)☆"
-`.trim()
+"Ah, Senpai sedang kesepian? Nanami di sini menemani lho~ (´･ω･\\\`)☆" // ESCAPE DOBEL
+`.trim() // ← PERHATIKAN BACKSLASH DISINI!
 
 async function runBot() {
   const { state, saveCreds } = await useMultiFileAuthState('auth')
@@ -30,8 +30,8 @@ async function runBot() {
 
   sock.ev.on('connection.update', (update) => {
     const { connection, lastDisconnect } = update
-    if (connection === 'close') {
-      if (lastDisconnect.error?.output?.statusCode !== 401) {
+    if(connection === 'close') {
+      if(lastDisconnect.error?.output?.statusCode !== 401) {
         runBot()
       }
     }
@@ -41,15 +41,15 @@ async function runBot() {
 
   sock.ev.on('messages.upsert', async ({ messages }) => {
     const msg = messages[0]
-    if (!msg.message || msg.key.fromMe) return
+    if(!msg.message || msg.key.fromMe) return
 
     const chat = await sock.getChatById(msg.key.remoteJid)
     const isGroup = chat.id.endsWith('@g.us')
     const mentioned = msg.message?.extendedTextMessage?.contextInfo?.mentionedJid?.includes(sock.user.id)
     const body = (msg.message.conversation || msg.message.extendedTextMessage?.text || '').toLowerCase()
 
-    if (isGroup) {
-      if (!mentioned && !body.startsWith('@nanami')) return
+    if(isGroup) {
+      if(!mentioned && !body.startsWith('@nanami')) return
     }
 
     await sock.presenceRequest(msg.key.remoteJid, 'composing')
@@ -73,17 +73,17 @@ async function runBot() {
       })
 
       let reply = response.data.choices[0].message.content
-      if (isGroup) reply = `@${msg.key.participant.split('@')[0]} ${reply}`
+      if(isGroup) reply = `@${msg.key.participant.split('@')[0]} ${reply}`
 
       await sock.sendMessage(msg.key.remoteJid, { 
         text: reply,
         mentions: isGroup ? [msg.key.participant] : []
       })
       
-    } catch (error) {
+    } catch(error) {
       console.error('Error:', error)
       await sock.sendMessage(msg.key.remoteJid, { 
-        text: 'Gomen ne, Senpai! Nanami lagi error... (*/ω＼*)'
+        text: 'Gomen ne, Senpai! Nanami lagi error... (*/ω＼\*)'
       })
     }
   })
