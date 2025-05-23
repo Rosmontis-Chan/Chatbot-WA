@@ -1,18 +1,13 @@
 {
-  "name": "chatbot-wa",
+  "name": "nanami-bot",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "preinstall": "rm -rf node_modules package-lock.json",  // FIXED!
-    "postinstall": "npm install --omit=dev"
+    "start": "node index.js"
   },
   "dependencies": {
-    "@whiskeysockets/baileys": "^6.6.0",
-    "axios": "^1.6.8",
-    "dotenv": "^16.4.1"
-  },
-  "engines": {
-    "node": ">=18.x"
+    "@whiskeysockets/baileys": "6.6.0",
+    "axios": "1.6.8",
+    "dotenv": "16.3.1"
   }
 }
