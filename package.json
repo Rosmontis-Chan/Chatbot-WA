@@ -1,15 +1,25 @@
 {
-  "name": "whatsapp-ai-bot-openrouter",
+  "name": "chatbot-wa",
   "version": "1.0.0",
-  "description": "Bot WhatsApp dengan AI via OpenRouter (by Nanami 🌸)",
+  "description": "🤖 WhatsApp AI Chatbot powered by OpenRouter API & WhatsApp-Web.js",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
   },
+  "engines": {
+    "node": "18.x"
+  },
+  "keywords": [
+    "whatsapp",
+    "chatbot",
+    "openrouter",
+    "wa-bot"
+  ],
+  "author": "Nanami Chan 🌸",
+  "license": "MIT",
   "dependencies": {
-    "whatsapp-web.js": "^1.21.1",
-    "axios": "^1.6.7",
-    "dotenv": "^16.4.5",
+    "axios": "^1.6.0",
+    "whatsapp-web.js": "^1.21.0",
     "qrcode-terminal": "^0.12.0"
   }
 } 
