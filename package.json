@@ -1,22 +1,13 @@
 {
-  "name": "chatbot-wa",
+  "name": "nanami-lightbot",
   "version": "1.0.0",
-  "description": "Chatbot WhatsApp menggunakan OpenRouter API",
+  "description": "Bot WhatsApp sederhana untuk testing",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
   },
-  "keywords": [
-    "whatsapp",
-    "chatbot",
-    "openrouter",
-    "railway"
-  ],
-  "author": "Nanami-Chan 🌸",
-  "license": "MIT",
   "dependencies": {
-    "axios": "^1.6.7",
-    "baileys": "^6.5.0",
-    "dotenv": "^16.4.5"
+    "qrcode-terminal": "^0.12.0",
+    "whatsapp-web.js": "^1.20.0"
   }
 }
